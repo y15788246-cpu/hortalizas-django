@@ -1,0 +1,49 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Pedidos</title>
+</head>
+<body>
+
+<h1>Historial de Pedidos</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID Pedido</th>
+            <th>Fecha</th>
+            <th>Total</th>
+            <th>Método</th>
+            <th>Ver</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in pedidos %}
+        <tr>
+            <td>#{{ p.id }}</td>
+            <td>{{ p.fecha }}</td>
+            <td>${{ p.total }}</td>
+            <td>{{ p.metodo_pago }}</td>
+            <td>
+                <a href="{% url 'ticket' p.id %}">Ver Ticket</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No hay pedidos registrados</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+<a href="{% url 'catalogo' %}">Volver al catálogo</a>
+    {% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'tienda/css/principal.css' %}">
+</head>
+<body>
+
+<h2>Ticket de Compra</h2>
+
+<p>Pedido #{{ pedido.id }}</p>
+<p>Fecha: {{ pedido.fecha }}</p>
+<p>Método de pago: {{ pedido.metodo_pago }}</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in detalles %}
+        <tr>
+            <td>{{ d.producto.nombre }}</td>
+            <td>{{ d.cantidad }}</td>
+            <td>${{ d.precio }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Total: ${{ pedido.total }}</h3>
+    {% endblock %}
+
+</body>
+</html>

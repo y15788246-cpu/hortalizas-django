@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Hortalizas{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'tienda/css/principal.css' %}">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="{% url 'index' %}">Inicio</a>
+    <a href="{% url 'catalogo' %}">Catálogo</a>
+    <a href="{% url 'carrito' %}">
+    🛒 Carrito (<span id="contador-carrito">0</span>)
+    </a>
+
+
+    {% if request.session.email_cliente %}
+        <span class="user-email">
+            {{ request.session.email_cliente }}
+        </span>
+        <a href="{% url 'logout_email' %}" class="btn-logout">Salir</a>
+    {% else %}
+        <a href="{% url 'login_email' %}" class="btn-login">Ingresar</a>
+    {% endif %}
+</nav>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+<script src="{% static 'tienda/js/carrito.js' %}"></script>
+<script src="{% static 'tienda/js/pago.js' %}"></script>
+<script src="{% static 'tienda/js/panel_admin.js' %}"></script>
+</body>
+</html>

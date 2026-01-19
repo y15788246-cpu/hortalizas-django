@@ -1,0 +1,223 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Administración - Hortalizas</title>
+
+    <!-- CSS Dashboard -->
+     <link rel="stylesheet" href="{% static 'css/principal.css' %}">
+     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body>
+
+<header class="admin-header">
+
+
+<main>
+
+    <!-- Buscador -->
+    <input type="text" id="busqueda" placeholder="Buscar por ID o email">
+    <span id="contador"></span>
+
+    <!-- Tabla de pedidos -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Total</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acción</th>
+                <th>Ticket</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-pedidos">
+            {% for p in pedidos %}
+            <tr>
+                <td>{{ p.id }}</td>
+                <td>{{ p.email }}</td>
+                <td>${{ p.total }}</td>
+                <td>{{ p.fecha }}</td>
+                <td><strong>{{ p.estado }}</strong></td>
+                <td>
+                    <form method="post" action="{% url 'cambiar_estado' p.id %}">
+                        {% csrf_token %}
+                        <select name="estado">
+                            <option value="pendiente" {% if p.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                            <option value="entregado" {% if p.estado == 'entregado' %}selected{% endif %}>Entregado</option>
+                        </select>
+                        <button type="submit">Actualizar</button>
+                    </form>
+                </td>
+                <td><a href="{% url 'ticket' p.id %}">Ver</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Dashboard Gráficos -->
+    <div class="dashboard">
+        <div class="card">
+            <h3>Ventas por Día</h3>
+            <canvas id="ventasChart"></canvas>
+        </div>
+        <div class="card">
+            <h3>Estado de Pedidos</h3>
+            <canvas id="estadoChart"></canvas>
+        </div>
+        <div class="card">
+            <h3>Ventas por Producto</h3>
+            <canvas id="productosChart"></canvas>
+        </div>
+        <div class="card">
+            <h3>Productos más Vendidos por Temporada</h3>
+            <canvas id="temporadaChart"></canvas>
+        </div>
+    </div>
+
+</main>
+
+<!-- PASAR DATOS DESDE DJANGO -->
+{{ dias|json_script:"dias-data" }}
+{{ ventas|json_script:"ventas-data" }}
+{{ pendientes|json_script:"pendientes-data" }}
+{{ entregados|json_script:"entregados-data" }}
+{{ nombres|json_script:"nombres-data" }}
+{{ ventas_productos|json_script:"ventas-productos-data" }}
+{{ productos_temporada|json_script:"productos-temporada-data" }}
+{{ cantidad_temporada|json_script:"cantidades-temporada-data" }}
+
+<!-- CHART.JS -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    // ===== Búsqueda de pedidos =====
+    const busqueda = document.getElementById('busqueda');
+    const tabla = document.querySelector('table tbody');
+    const filas = tabla.querySelectorAll('tr');
+    const contador = document.getElementById('contador');
+
+    function filtrar() {
+        let visibles = 0;
+        const texto = busqueda.value.toLowerCase();
+        filas.forEach(fila => {
+            const id = fila.cells[0].textContent.toLowerCase();
+            const email = fila.cells[1].textContent.toLowerCase();
+            if(id.includes(texto) || email.includes(texto)) {
+                fila.style.display = '';
+                visibles++;
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+        contador.textContent = `Pedidos encontrados: ${visibles}`;
+    }
+    busqueda.addEventListener('input', filtrar);
+
+    // ===== Datos JSON de Django =====
+    const dias = JSON.parse(document.getElementById('dias-data').textContent);
+    const ventas = JSON.parse(document.getElementById('ventas-data').textContent);
+    const pendientes = JSON.parse(document.getElementById('pendientes-data').textContent);
+    const entregados = JSON.parse(document.getElementById('entregados-data').textContent);
+    const nombres = JSON.parse(document.getElementById('nombres-data').textContent);
+    const ventas_productos = JSON.parse(document.getElementById('ventas-productos-data').textContent);
+    const productos_temporada = JSON.parse(document.getElementById('productos-temporada-data').textContent);
+    const cantidades_temporada = JSON.parse(document.getElementById('cantidades-temporada-data').textContent);
+
+    // ===== Gráfico Ventas por Día =====
+    new Chart(document.getElementById('ventasChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: dias,
+            datasets: [{
+                label: 'Ventas por día',
+                data: ventas,
+                borderColor: 'rgba(52,152,219,1)',
+                backgroundColor: 'rgba(52,152,219,0.2)',
+                fill:true,
+                tension:0.3
+            }]
+        },
+        options: { scales: { y: { beginAtZero: true } } }
+    });
+
+    // ===== Gráfico Estado de Pedidos =====
+    new Chart(document.getElementById('estadoChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels:['Pendientes','Entregados'],
+            datasets:[{
+                data:[pendientes,entregados],
+                backgroundColor:['rgba(231,76,60,0.6)','rgba(46,204,113,0.6)'],
+                borderColor:['rgba(231,76,60,1)','rgba(46,204,113,1)']
+            }]
+        }
+    });
+
+    // ===== Gráfico Ventas por Producto =====
+    new Chart(document.getElementById('productosChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: nombres,
+            datasets:[{
+                label:'Cantidad vendida',
+                data: ventas_productos,
+                backgroundColor:'rgba(75,192,192,0.6)',
+                borderColor:'rgba(75,192,192,1)',
+                borderWidth:1
+            }]
+        },
+        options:{ scales:{ y:{ beginAtZero:true } } }
+    });
+
+    // ===== Gráfico Top 5 Productos por Temporada =====
+    const combinados = productos_temporada.map((prod,i) => ({nombre:prod, cantidad:cantidades_temporada[i]}));
+    combinados.sort((a,b) => b.cantidad - a.cantidad);
+    const top5 = combinados.slice(0,5);
+    const top5Nombres = top5.map(item => item.nombre);
+    const top5Cantidades = top5.map(item => item.cantidad);
+
+    const colores = [
+        'rgba(231, 76, 60, 0.7)',
+        'rgba(52, 152, 219, 0.7)',
+        'rgba(46, 204, 113, 0.7)',
+        'rgba(155, 89, 182, 0.7)',
+        'rgba(241, 196, 15, 0.7)'
+    ];
+    const borderColores = colores.map(c => c.replace('0.7','1'));
+
+    new Chart(document.getElementById('temporadaChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: top5Nombres,
+            datasets: [{
+                label: 'Cantidad vendida',
+                data: top5Cantidades,
+                backgroundColor: colores,
+                borderColor: borderColores,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} vendidos` } }
+            },
+            scales: {
+                y: { beginAtZero:true, title: { display:true, text:'Cantidad vendida' } },
+                x: { title: { display:true, text:'Productos' } }
+            }
+        }
+    });
+
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Hortalizas – Inicio</title>
+</head>
+<body>
+
+<h1>Bienvenido a Hortalizas</h1>
+
+<p>
+    Venta de hortalizas frescas directamente a tu hogar.
+</p>
+
+<hr>
+
+<p>
+    Calificación de la tienda:
+</p>
+
+<div class="estrellas">
+    {% for i in "12345" %}
+        {% if promedio|floatformat:0 >= forloop.counter %}
+            ★
+        {% else %}
+            ☆
+        {% endif %}
+    {% endfor %}
+</div>
+
+<p>
+    {{ promedio }} / 5
+</p>
+
+
+<br>
+<hr>
+
+<h3>Opiniones de nuestros clientes</h3>
+
+{% if comentarios %}
+    {% for c in comentarios %}
+        <div style="border-bottom:1px solid #ccc; padding:10px 0;">
+            <strong>
+                {% for i in "12345" %}
+                    {% if c.estrellas >= forloop.counter %}★{% else %}☆{% endif %}
+                {% endfor %}
+            </strong>
+            <p>{{ c.comentario }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Aún no hay opiniones.</p>
+{% endif %}
+
+{% if request.session.email_cliente %}
+    <p>
+        Sesión iniciada como {{ request.session.email_cliente }}
+        <a href="{% url 'logout_email' %}">Salir</a>
+    </p>
+{% else %}
+    <a href="{% url 'login_email' %}">Ingresar</a>
+{% endif %}
+
+<a href="{% url 'catalogo' %}">
+    <button>Ver catálogo</button>
+</a>
+    {% endblock %}
+</body>
+</html>

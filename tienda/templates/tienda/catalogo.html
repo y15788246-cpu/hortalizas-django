@@ -1,0 +1,32 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<h1>Catálogo de Hortalizas</h1>
+
+<div class="catalogo">
+    {% for producto in productos %}
+        <div class="producto">
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+            <h3>{{ producto.nombre }}</h3>
+            <p>${{ producto.precio }} / {{ producto.unidad }}</p>
+            <p>Stock: {{ producto.stock }}</p>
+<button 
+    class="btn-agregar"
+    data-id="{{ producto.id }}"
+    data-nombre="{{ producto.nombre }}"
+    data-precio="{{ producto.precio }}"
+    data-imagen="{{ producto.imagen.url }}"
+    data-stock="{{ producto.stock }}"
+>
+    Agregar al carrito
+</button>
+
+        </div>
+    {% empty %}
+        <p>No hay productos disponibles.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

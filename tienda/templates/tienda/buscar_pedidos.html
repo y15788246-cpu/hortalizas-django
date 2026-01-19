@@ -1,0 +1,40 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis pedidos</title>
+    <link rel="stylesheet" href="{% static 'tienda/css/principal.css' %}">
+</head>
+<body>
+
+<h2>Consulta tus pedidos</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="email" name="email" placeholder="Tu email" required>
+    <button type="submit">Buscar</button>
+</form>
+
+<hr>
+
+{% if pedidos %}
+    {% for p in pedidos %}
+<p>
+    Pedido #{{ p.id }} —
+    ${{ p.total }} —
+    {{ p.fecha }} —
+    <strong>{{ p.estado|capfirst }}</strong>
+    <a href="{% url 'ticket' p.id %}">Ver ticket</a>
+</p>
+
+    {% endfor %}
+{% elif pedidos is not None %}
+    <p>No se encontraron pedidos.</p>
+{% endif %}
+    {% endblock %}
+
+</body>
+</html>

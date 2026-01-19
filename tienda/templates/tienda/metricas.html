@@ -1,0 +1,27 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Métricas</title>
+    <link rel="stylesheet" href="{% static 'tienda/css/principal.css' %}">
+</head>
+<body>
+
+<h2>Métricas del negocio</h2>
+
+<ul>
+    <li><strong>Total de pedidos:</strong> {{ total_pedidos }}</li>
+    <li><strong>Ingresos totales:</strong> ${{ total_ingresos }}</li>
+    <li><strong>Calificación promedio:</strong> ⭐ {{ promedio_calificacion }} / 5</li>
+    <li><strong>Pedidos entregados:</strong> {{ entregados }}</li>
+    <li><strong>Pedidos pendientes:</strong> {{ pendientes }}</li>
+</ul>
+
+<a href="{% url 'panel_admin' %}">Volver al panel</a>
+    {% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<h1>HORTALIZAS</h1>
+<h2>Ticket de Compra</h2>
+
+<p><strong>Pedido #:</strong> {{ pedido.id }}</p>
+<p><strong>Fecha:</strong> {{ pedido.fecha }}</p>
+<p><strong>Método de pago:</strong> {{ pedido.metodo_pago }}</p>
+<p><strong>Dirección:</strong> {{ pedido.direccion }}</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in detalles %}
+        <tr>
+            <td>{{ d.producto.nombre }}</td>
+            <td>{{ d.cantidad }}</td>
+            <td>${{ d.subtotal }}</td>
+            <p><strong>Estado del pedido:</strong> {{ pedido.estado|capfirst }}</p>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p class="total">
+    <strong>Total: ${{ pedido.total }}</strong>
+</p>
+
+{% if messages %}
+  {% for message in messages %}
+    <p>{{ message }}</p>
+  {% endfor %}
+{% endif %}
+
+<hr>
+
+<h3>Califica tu compra</h3>
+
+<form method="post" action="{% url 'calificar' pedido.id %}">
+    {% csrf_token %}
+
+    <div class="rating">
+        {% for i in "54321" %}
+        <input type="radio" id="star{{ i }}" name="estrellas" value="{{ i }}" required>
+        <label for="star{{ i }}">★</label>
+        {% endfor %}
+    </div>
+
+    <br>
+
+    <textarea name="comentario" placeholder="Comentario opcional" rows="3" style="width:100%;"></textarea>
+
+    <br><br>
+
+    <button type="submit">Enviar calificación</button>
+</form>
+
+
+<div class="acciones">
+    <button onclick="window.print()">Imprimir Ticket</button>
+    <br><br>
+    <a href="{% url 'catalogo' %}">Volver al catálogo</a>
+</div>
+<a href="{% url 'ticket_pdf' pedido.id %}" target="_blank">
+    Descargar PDF
+</a>
+    {% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ingresar</title>
+</head>
+<body>
+
+<h2>Ingresa con tu correo</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="email" name="email" required placeholder="correo@email.com">
+    <button type="submit">Entrar</button>
+</form>
+    {% endblock %}
+
+</body>
+</html>

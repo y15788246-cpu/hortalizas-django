@@ -1,0 +1,36 @@
+{% extends 'tienda/base.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pago</title>
+</head>
+<body>
+
+<h1>Finalizar compra</h1>
+
+<form id="form-pago">
+    {% csrf_token %}
+
+    <label>Email:</label><br>
+    <input type="email" id="email" required><br><br>
+
+    <label>Dirección:</label><br>
+    <textarea id="direccion" required></textarea><br><br>
+
+    <label>Método de pago:</label><br>
+    <select id="metodo">
+        <option value="Efectivo">Efectivo</option>
+        <option value="Tarjeta">Tarjeta</option>
+    </select><br><br>
+
+    <button type="submit">Confirmar pedido</button>
+</form>
+
+<script src="{% static 'tienda/js/pago.js' %}"></script>
+    {% endblock %}
+</body>
+</html>

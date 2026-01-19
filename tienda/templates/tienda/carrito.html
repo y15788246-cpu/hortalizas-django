@@ -1,0 +1,25 @@
+{% extends 'tienda/base.html' %}
+
+{% block title %}Carrito{% endblock %}
+
+{% block content %}
+
+<h1>Tu carrito</h1>
+
+<div id="carrito"></div>
+
+<h3>Total: $<span id="total">0</span></h3>
+
+<a href="{% url 'pago' %}">
+    <button>Proceder al pago</button>
+</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof mostrarCarrito === 'function') {
+            mostrarCarrito();
+        }
+    });
+</script>
+
+{% endblock %}
